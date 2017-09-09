@@ -10,9 +10,23 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+Instructions
 
+The goal of this assignment is to study the Naïve Bayes classifier in a bit more
+detail. It is really important to understand how the basic probabilities are
+calculated and used in the Naïve Bayes classifier. To do this, we are going to build
+a simple artificial data set and perform some of the calculations performed by
+the model by hand. Be sure to review your notes and the lab before beginning
+this assignment. There is a bit of reading involved but you don’t have to write a
+lot of code to complete this assignment – a single afternoon of focused work
+should suffice. As always, please let me know if you have any difficulties in
+understanding the assignment. You should submit your markdown file and make
+sure it runs. Also – please don’t write anything in Greek in the markdown file,
+your submission should be in English.
 
 ## Question 1
+Simply execute the following series of commands to create an artificial data
+set:
 
 ```{r }
 d1	<- c(1,	0,	0,	1,	0,	0,	0,	1)
@@ -32,6 +46,11 @@ df <- nb_df
 ```
 
 ## Question 2
+Using the data frame you just constructed, create a vector of class
+probabilities for the two classes, 0 and 1. That is, compute P(C) for each of
+these two classes and store this in a vector called priors. Hint: You just
+need the Decision Column for this, don’t you?
+
 Decision = 1	when	we	reject	the	loan	and	Decision = 0	when	we	accept it
 
 ```{r }
@@ -45,6 +64,15 @@ priors
 ```
 
 ## Question 3
+Compute a summary data frame in which one row contains the
+probabilities P(Fi = 1|Class = 0) for all the different features Fi and the
+other row contains the probabilities P(Fi = 1|Class = 1). For example, the
+cell at [1,1] could contain the probability that when we accept the loan
+(class = 0) the loan applicant has bad credit (BadCredit = 1). To compute
+the probabilities we just need to group our data by class and find the
+relative proportion of 1’s for each feature. This is maximum likelihood
+estimation. Hint: Try using the aggregate() function, see if that helps.
+
 Compute  P(Fi = 1|Class = 0) & P(Fi = 1|Class = 1)
 
 ```{r }
@@ -64,6 +92,11 @@ probs
 ```
 
 ## Question 4
+Examine this matrix of two rows you just created. One row has the
+probability of a feature taking the value 1 for class 0 and the other row has
+the probability of a feature taking the value 1 for class 1. Why do these
+probabilities not add up to 1 i.e. if we add the two rows together, why do we
+not get a row of 1’s?
 
 ```{r }
 #Decision 1 | 0
@@ -116,6 +149,9 @@ and P(Fi = 0|Class = 1) + P(Fi = 1|Class = 1) = 1
 
 
 ## Question 5
+What trivial expression can be used to convert our matrix of values with
+P(Fi = 1|C) to one in which the values are P(Fi = 0|C)?
+
 p1lC: P(Fi = 1|C)
 p0lC: P(Fi = 0|C)
 
@@ -128,6 +164,10 @@ p0lC
 ```
 
 ## Question 6
+According to our model, what is the probability that the bank will decide to
+give out a loan (Decision = 0) when the customer has a bad credit score
+(BadCredit = 0)? Why is this going to be a problem during prediction?
+
 p1lC: P(Fi = 1|C)
 p0lC: P(Fi = 0|C)
 
@@ -139,7 +179,14 @@ p1lC
 p0lC 
 ```
 
-## Question 6
+## Question 7
+Recalculate your matrix of probabilities that you computed in step 4 to
+incorporate additive smoothing. Hint: One easy way to do this is to add
+extra rows to the original matrix and use the same approach you used
+before. You don’t have to do it this way though; there are many ways to
+implement this function. When you are done, make sure that your
+computed probabilities are what you expected to find.
+
 P(Decision = 0 | BadCredit = 0) = p0lC[1,1] = 4/4 = 1 and
 P(Decision = 0 | BadCredit = 1) = p1lC[1,1] = 0/4 = 0
 
@@ -213,13 +260,34 @@ smoothprobs[1,3]
 
 ## Question 7
 
+Recalculate your matrix of probabilities that you computed in step 4 to
+incorporate additive smoothing. Hint: One easy way to do this is to add
+extra rows to the original matrix and use the same approach you used
+before. You don’t have to do it this way though; there are many ways to
+implement this function. When you are done, make sure that your
+computed probabilities are what you expected to find.
 
 ```{r }
 smoothprobs
 ```
 
 ## Question 8
+Implement a simple function that makes predictions for your Naïve Bayes
+model. The function will take as input a data frame with 7 columns (one for
+each feature), a probability vector with the class probabilities we
+computed in step 2, and the conditional feature probabilities that you
+computed in step 6. Here is the function signature:
 
+predict_nb <- function(test_df, priors, prob_matrix) {
+# Your code here
+}
+
+The output of this function is going to be a vector with the predicted value
+for each test observation in the input data frame, test_df. Thus, its length
+will be that of the number of rows (observations) in that data frame. HINT:
+Try writing a function for computing the right answer for a single
+observation and then use this function with an apply formula to extend it to
+work on an entire data frame.
 
 ```{r }
 prob_matrix <- smoothprobs
@@ -270,7 +338,8 @@ predict_nb(test_df, priors, prob_matrix)
 
 
 ## Question 9
-
+Compute the training accuracy of your Naïve Bayes model using the
+function that you just created.
 
 ```{r }
 predict_nb <- function(test_df, priors, prob_matrix) {
